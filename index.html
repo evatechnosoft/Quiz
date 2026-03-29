@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F172A">
+<meta name="description" content="MEB 4. Sınıf Soru Bankası - Matematik, Türkçe, Fen Bilimleri, Sosyal Bilgiler">
+<title>4. Sınıf Soru Bankası 📚</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100vh;min-height:100dvh;overscroll-behavior:none}
+body{background:linear-gradient(135deg,#0F172A 0%,#1E293B 50%,#0F172A 100%);font-family:'Nunito','Segoe UI',sans-serif;color:#F1F5F9}
+.app{max-width:480px;margin:0 auto;padding:16px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.hidden{display:none!important}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;-webkit-appearance:none}
+input{font-family:inherit;-webkit-appearance:none}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes confetti{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.btn-primary{background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;border-radius:14px;padding:16px;font-weight:700;font-size:15px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s}
+.btn-primary:active{transform:scale(.97)}
+.card{background:#1E293B;border:1px solid #334155;border-radius:16px;padding:16px;margin-bottom:12px}
+.tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block}
+.progress-bar{height:6px;background:#1E293B;border-radius:3px;overflow:hidden;margin-bottom:16px}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.q-dot{width:28px;height:28px;border-radius:8px;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+// ============================================
+// MEB 4. SINIF SORU BANKASI - Genişletilmiş
+// ============================================
+
+const COURSES = {
+  matematik: {
+    name: "Matematik", icon: "🔢", color: "#4F46E5",
+    units: {
+      "1donem": [
+        { id:"m1", unit:"1. Ünite", topics:["Doğal Sayılar","Toplama İşlemi","Çıkarma İşlemi"] },
+        { id:"m2", unit:"2. Ünite", topics:["Toplama İşlemi (İleri)","Çıkarma İşlemi (İleri)"] },
+        { id:"m3", unit:"3. Ünite", topics:["Çarpma İşlemi","Bölme İşlemi"] },
+      ],
+      "2donem": [
+        { id:"m4", unit:"4. Ünite", topics:["Kesirler","Kesirlerle İşlemler","Zaman Ölçme","Veri Toplama"] },
+        { id:"m5", unit:"5. Ünite", topics:["Geometrik Cisimler","Temel Kavramlar","Uzamsal İlişkiler","Uzunluk Ölçme"] },
+        { id:"m6", unit:"6. Ünite", topics:["Çevre Ölçme","Alan Ölçme","Tartma","Sıvı Ölçme"] },
+      ]
+    }
+  },
+  turkce: {
+    name: "Türkçe", icon: "📖", color: "#DC2626",
+    units: {
+      "1donem": [
+        { id:"t1", unit:"1. Tema", topics:["Okuma Anlama","Söz Varlığı","Yazma"] },
+        { id:"t2", unit:"2. Tema", topics:["Anlam Bilgisi","Eş-Zıt Anlamlılar","Mecaz Anlam"] },
+        { id:"t3", unit:"3. Tema", topics:["Dil Bilgisi: İsimler","Sıfatlar","Zamirler"] },
+        { id:"t4", unit:"4. Tema", topics:["Noktalama İşaretleri","Yazım Kuralları"] },
+      ],
+      "2donem": [
+        { id:"t5", unit:"5. Tema", topics:["Fiiller","Cümlenin Öğeleri"] },
+        { id:"t6", unit:"6. Tema", topics:["Paragraf Anlama","Ana Düşünce"] },
+        { id:"t7", unit:"7. Tema", topics:["Metin Türleri","Görsel Okuma"] },
+        { id:"t8", unit:"8. Tema", topics:["Dinleme-İzleme","Sözel İfade"] },
+      ]
+    }
+  },
+  fen: {
+    name: "Fen Bilimleri", icon: "🔬", color: "#059669",
+    units: {
+      "1donem": [
+        { id:"f1", unit:"1. Ünite", topics:["Yer Kabuğu","Dünya'nın Hareketleri"] },
+        { id:"f2", unit:"2. Ünite", topics:["Besinler ve Sağlık","Dengeli Beslenme"] },
+        { id:"f3", unit:"3. Ünite", topics:["Kuvvet ve Hareket","Mıknatıslar"] },
+      ],
+      "2donem": [
+        { id:"f4", unit:"4. Ünite", topics:["Maddenin Özellikleri","Kütle-Hacim","Hal Değişimi","Saf Madde-Karışım"] },
+        { id:"f5", unit:"5. Ünite", topics:["Aydınlatma Teknolojileri","Ses Teknolojileri","Işık Kirliliği"] },
+        { id:"f6", unit:"6. Ünite", topics:["Bilinçli Tüketici","Geri Dönüşüm"] },
+        { id:"f7", unit:"7. Ünite", topics:["Basit Elektrik Devreleri","Devre Elemanları"] },
+      ]
+    }
+  },
+  sosyal: {
+    name: "Sosyal Bilgiler", icon: "🌍", color: "#D97706",
+    units: {
+      "1donem": [
+        { id:"s1", unit:"1. Ünite", topics:["Bireysel Farklılıklar","Kendini Tanıma"] },
+        { id:"s2", unit:"2. Ünite", topics:["Kültür ve Miras","Milli Kültür Ögeleri"] },
+        { id:"s3", unit:"3. Ünite", topics:["İnsanlar ve Yönetim","Yönetim Biçimleri"] },
+      ],
+      "2donem": [
+        { id:"s4", unit:"4. Ünite", topics:["Bilim ve Teknoloji","Teknolojik Gelişmeler"] },
+        { id:"s5", unit:"5. Ünite", topics:["Üretim ve Tüketim","Ekonomi"] },
+        { id:"s6", unit:"6. Ünite", topics:["Uzak Yerlerin Yaşamı","Farklı Kültürler"] },
+        { id:"s7", unit:"7. Ünite", topics:["Çevre ve Doğa","Doğal Afetler"] },
+      ]
+    }
+  }
+};
+
+// ============================================
+// GENİŞLETİLMİŞ SORU BANKASI
+// ============================================
+const QUESTION_BANK = {
+  matematik: {
+    mc: [
+      {q:"345 sayısında 4 rakamının basamak değeri kaçtır?", o:["4","40","400","4000"], a:1, e:"4 rakamı onlar basamağında: 4×10=40", u:"m1", d:"easy"},
+      {q:"En küçük dört basamaklı sayı hangisidir?", o:["9999","1000","1001","999"], a:1, e:"En küçük 4 basamaklı sayı 1000'dir.", u:"m1", d:"easy"},
+      {q:"2, 5, 8, 11, ... örüntüsünde sonraki sayı?", o:["12","13","14","15"], a:2, e:"Her adımda 3 ekleniyor: 11+3=14", u:"m1", d:"easy"},
+      {q:"Hangi sayı 5000'e en yakındır?", o:["4850","5120","4990","5200"], a:2, e:"4990, 5000'e sadece 10 uzaklıkta.", u:"m1", d:"medium"},
+      {q:"3 × 4 × 5 işleminin sonucu kaçtır?", o:["50","55","60","65"], a:2, e:"3×4=12, 12×5=60", u:"m3", d:"easy"},
+      {q:"72 ÷ 8 = ?", o:["8","9","7","6"], a:1, e:"72÷8=9", u:"m3", d:"easy"},
+      {q:"144 ÷ 12 = ?", o:["11","12","13","14"], a:1, e:"144÷12=12", u:"m3", d:"medium"},
+      {q:"25 × 4 = ?", o:["90","95","100","105"], a:2, e:"25×4=100", u:"m3", d:"easy"},
+      {q:"Bir sayının 6 ile çarpımı 54 ise o sayı kaçtır?", o:["7","8","9","10"], a:2, e:"54÷6=9", u:"m3", d:"medium"},
+      {q:"156 + 244 = ?", o:["390","400","410","380"], a:1, e:"156+244=400", u:"m1", d:"easy"},
+      {q:"1000 - 347 = ?", o:["653","753","643","663"], a:0, e:"1000-347=653", u:"m1", d:"medium"},
+      {q:"Bir bütünün 3/4'ü kaç parçadan oluşur?", o:["3","4","7","1"], a:0, e:"3/4 kesrinde pay 3, yani 3 parça.", u:"m4", d:"easy"},
+      {q:"2/5 + 1/5 = ?", o:["3/5","3/10","2/10","1/5"], a:0, e:"Paydalar eşit: 2+1=3 → 3/5", u:"m4", d:"easy"},
+      {q:"3/8 kesrinde payda kaçtır?", o:["3","8","11","5"], a:1, e:"Kesir çizgisinin altındaki sayı paydadır: 8", u:"m4", d:"easy"},
+      {q:"1 saat 30 dakika kaç dakikadır?", o:["80","90","100","130"], a:1, e:"60+30=90 dakika", u:"m4", d:"easy"},
+      {q:"Saat 14:45'te öğleden sonra saat kaçtır?", o:["2:45","3:45","4:45","2:15"], a:0, e:"14:45-12:00=2:45 ÖS", u:"m4", d:"medium"},
+      {q:"Dikdörtgenin kaç köşesi vardır?", o:["3","4","5","6"], a:1, e:"Dikdörtgenin 4 köşesi var.", u:"m5", d:"easy"},
+      {q:"Küpün kaç yüzü vardır?", o:["4","5","6","8"], a:2, e:"Küpün 6 yüzü vardır.", u:"m5", d:"easy"},
+      {q:"Dik açı kaç derecedir?", o:["45°","60°","90°","180°"], a:2, e:"Dik açı 90 derecedir.", u:"m5", d:"medium"},
+      {q:"Bir kenarı 5 cm olan karenin çevresi kaç cm?", o:["15","20","25","10"], a:1, e:"Çevre=4×5=20 cm", u:"m6", d:"easy"},
+      {q:"Uzunluğu 8 cm, genişliği 3 cm olan dikdörtgenin alanı?", o:["11 cm²","22 cm²","24 cm²","26 cm²"], a:2, e:"Alan=8×3=24 cm²", u:"m6", d:"medium"},
+      {q:"Bir kenarı 6 cm olan karenin alanı kaç cm²?", o:["24","30","36","42"], a:2, e:"Alan=6×6=36 cm²", u:"m6", d:"medium"},
+      {q:"3 kg 500 g kaç gramdır?", o:["350","3050","3500","35000"], a:2, e:"3×1000+500=3500 g", u:"m6", d:"medium"},
+      {q:"1 litre = ? mililitre", o:["10","100","1000","10000"], a:2, e:"1 L=1000 mL", u:"m6", d:"easy"},
+      {q:"Dikdörtgenin çevresi nasıl hesaplanır?", o:["a×b","2×(a+b)","a+b","4×a"], a:1, e:"Çevre=2×(uzunluk+genişlik)", u:"m6", d:"hard"},
+    ],
+    tf: [
+      {q:"En büyük üç basamaklı sayı 999'dur.", a:true, e:"Doğru! 999 en büyük 3 basamaklı sayıdır.", u:"m1", d:"easy"},
+      {q:"Çarpma işleminde sıra değişirse sonuç değişir.", a:false, e:"Yanlış! Değişme özelliği var: 3×5=5×3", u:"m3", d:"easy"},
+      {q:"1 kg = 100 gram'dır.", a:false, e:"Yanlış! 1 kg=1000 gram", u:"m6", d:"easy"},
+      {q:"Karenin tüm kenarları eşittir.", a:true, e:"Doğru! 4 kenar eşittir.", u:"m5", d:"easy"},
+      {q:"Bir kesirde üstteki sayıya payda denir.", a:false, e:"Yanlış! Üstteki pay, alttaki paydadır.", u:"m4", d:"easy"},
+      {q:"Toplama işleminde toplananların yeri değişince sonuç değişmez.", a:true, e:"Doğru! Toplama değişme özelliği.", u:"m1", d:"easy"},
+      {q:"0 sayısı doğal sayı değildir.", a:false, e:"Yanlış! 0, en küçük doğal sayıdır.", u:"m1", d:"medium"},
+      {q:"Dikdörtgenin karşılıklı kenarları eşittir.", a:true, e:"Doğru! Dikdörtgenin karşılıklı kenarları eşit uzunluktadır.", u:"m5", d:"easy"},
+      {q:"1 metre 10 santimetredir.", a:false, e:"Yanlış! 1 m=100 cm", u:"m6", d:"easy"},
+      {q:"Bölme işleminde bölen 0 olamaz.", a:true, e:"Doğru! Sıfıra bölme tanımsızdır.", u:"m3", d:"medium"},
+    ],
+    fb: [
+      {q:"1 metre = ___ santimetre", a:"100", e:"1 m=100 cm", u:"m6", d:"easy"},
+      {q:"24 ÷ 6 = ___", a:"4", e:"24÷6=4", u:"m3", d:"easy"},
+      {q:"Kenarı 7 cm olan karenin çevresi ___ cm'dir.", a:"28", e:"Çevre=4×7=28", u:"m6", d:"easy"},
+      {q:"1 litre = ___ mililitre", a:"1000", e:"1 L=1000 mL", u:"m6", d:"easy"},
+      {q:"15 × 4 = ___", a:"60", e:"15×4=60", u:"m3", d:"easy"},
+      {q:"1 saat = ___ dakika", a:"60", e:"1 saat=60 dakika", u:"m4", d:"easy"},
+      {q:"Üçgenin ___ köşesi vardır.", a:"3", e:"Üçgenin 3 köşesi var.", u:"m5", d:"easy"},
+      {q:"1 km = ___ metre", a:"1000", e:"1 km=1000 m", u:"m6", d:"easy"},
+    ]
+  },
+  turkce: {
+    mc: [
+      {q:"'Güneş doğdu.' cümlesinde özne hangisidir?", o:["doğdu","güneş","doğ","güneşler"], a:1, e:"Eylemi yapan güneştir.", u:"t1", d:"easy"},
+      {q:"'Büyük' kelimesinin zıt anlamlısı?", o:["Uzun","Küçük","Geniş","Yüksek"], a:1, e:"Büyük ↔ Küçük", u:"t2", d:"easy"},
+      {q:"'Ayağını denk al' deyiminin anlamı?", o:["Koşmak","Dikkatli olmak","Ayakları eşit tutmak","Yürümek"], a:1, e:"'Dikkatli ol' anlamındadır.", u:"t2", d:"medium"},
+      {q:"'Güzel çiçek' ifadesinde 'güzel' sözcüğü nedir?", o:["İsim","Fiil","Sıfat","Zamir"], a:2, e:"Çiçeği nitelediği için sıfattır.", u:"t3", d:"easy"},
+      {q:"'Çocuklar parkta oynuyor.' cümlesindeki fiil?", o:["Çocuklar","parkta","oynuyor","park"], a:2, e:"'Oynuyor' eylem bildiriyor.", u:"t5", d:"easy"},
+      {q:"'O bugün okula gelmedi.' cümlesinde 'o' ne tür bir kelimedir?", o:["İsim","Sıfat","Zamir","Fiil"], a:2, e:"'O' kişi zamiridir.", u:"t3", d:"easy"},
+      {q:"Cümle sonunda soru soruluyorsa hangi işaret konur?", o:["Nokta","Ünlem","Soru işareti","Virgül"], a:2, e:"Soru cümlelerinin sonuna soru işareti konur.", u:"t4", d:"easy"},
+      {q:"'Ali okula gitti.' cümlesinde yüklem hangisidir?", o:["Ali","okula","gitti","oku"], a:2, e:"Yüklem cümledeki eylemdir: gitti", u:"t5", d:"easy"},
+      {q:"'Hızlı' kelimesi hangi sözcük türüdür?", o:["İsim","Sıfat","Fiil","Zamir"], a:1, e:"Hızlı bir niteleme sıfatıdır.", u:"t3", d:"easy"},
+      {q:"Paragrafın en önemli mesajına ne denir?", o:["Yardımcı düşünce","Konu","Ana düşünce","Başlık"], a:2, e:"Paragrafın temel mesajı ana düşüncedir.", u:"t6", d:"easy"},
+      {q:"Atasözleri hangi tür ifadelerdir?", o:["Mecaz","Deyim","Atasözü","Terim"], a:2, e:"Atasözleri toplumun deneyimlerinden çıkan özlü sözlerdir.", u:"t2", d:"medium"},
+      {q:"'İstanbul' kelimesi neden büyük harfle yazılır?", o:["Cümle başı","Özel isim","Sıfat","Fiil"], a:1, e:"Şehir adları özel isimdir.", u:"t4", d:"easy"},
+      {q:"Hangisi bir birleşik kelimedir?", o:["Masa","Kalemlik","Ayçiçeği","Defter"], a:2, e:"Ayçiçeği, ay+çiçeği birleşimidir.", u:"t2", d:"medium"},
+      {q:"'Kitap okudum, film izledim.' cümlesindeki virgülün görevi?", o:["Sıralama","Seslenme","Açıklama","Ara söz"], a:0, e:"Sıralanan cümleleri ayırır.", u:"t4", d:"medium"},
+      {q:"Bir metnin türünü belirlerken hangisine bakılır?", o:["Uzunluk","Anlatım biçimi","Sayfa sayısı","Yazı boyutu"], a:1, e:"Metnin türü anlatım biçimine göre belirlenir.", u:"t7", d:"medium"},
+    ],
+    tf: [
+      {q:"'Koştu' kelimesi bir fiildir.", a:true, e:"Doğru! Eylem bildiriyor.", u:"t5", d:"easy"},
+      {q:"Cümlenin sonuna her zaman nokta konur.", a:false, e:"Yanlış! Soru veya ünlem cümlelerinde farklı işaretler kullanılır.", u:"t4", d:"easy"},
+      {q:"'O' kelimesi bir zamirdir.", a:true, e:"Doğru! Kişi zamiri.", u:"t3", d:"easy"},
+      {q:"Büyük harfle yazılan her kelime özel isimdir.", a:false, e:"Yanlış! Cümle başları da büyük harfle başlar.", u:"t4", d:"easy"},
+      {q:"Deyimler gerçek anlamda kullanılır.", a:false, e:"Yanlış! Deyimler genellikle mecaz anlamlıdır.", u:"t2", d:"medium"},
+      {q:"İsimler varlıklara verilen adlardır.", a:true, e:"Doğru! İsim=ad.", u:"t3", d:"easy"},
+      {q:"Sıfatlar fiilleri niteler.", a:false, e:"Yanlış! Sıfatlar isimleri niteler.", u:"t3", d:"medium"},
+    ],
+    fb: [
+      {q:"İsmin yerine kullanılan kelimelere ___ denir.", a:"zamir", e:"Zamir, ismin yerini tutar.", u:"t3", d:"easy"},
+      {q:"Paragrafın en önemli mesajına ___ düşünce denir.", a:"ana", e:"Ana düşünce paragrafın temel mesajıdır.", u:"t6", d:"easy"},
+      {q:"'Koştu, okudu, yazdı' kelimeleri ___ türündedir.", a:"fiil", e:"Eylem bildiren kelimeler fiildir.", u:"t5", d:"easy"},
+      {q:"Cümlenin sonundaki eyleme ___ denir.", a:"yüklem", e:"Yüklem, cümlenin temel ögesidir.", u:"t5", d:"easy"},
+      {q:"Bir varlığı niteleyen kelimelere ___ denir.", a:"sıfat", e:"Sıfat, isimleri niteleyen sözcüktür.", u:"t3", d:"easy"},
+    ]
+  },
+  fen: {
+    mc: [
+      {q:"Dünya kendi ekseni etrafında bir turu kaç saatte tamamlar?", o:["12 saat","24 saat","48 saat","365 gün"], a:1, e:"Dünya kendi ekseninde 24 saatte döner.", u:"f1", d:"easy"},
+      {q:"Dünya'nın Güneş etrafında dönmesi neye sebep olur?", o:["Gece-gündüz","Mevsimler","Gelgit","Deprem"], a:1, e:"Güneş etrafında dönüş mevsimlere sebep olur.", u:"f1", d:"medium"},
+      {q:"Aşağıdakilerden hangisi protein kaynağıdır?", o:["Ekmek","Et","Patates","Pirinç"], a:1, e:"Et protein bakımından zengindir.", u:"f2", d:"easy"},
+      {q:"Dengeli beslenme için günde kaç öğün yenmelidir?", o:["1","2","3","5"], a:2, e:"Günde 3 ana öğün önerilir.", u:"f2", d:"easy"},
+      {q:"Mıknatıs hangisini çeker?", o:["Plastik","Tahta","Demir","Cam"], a:2, e:"Mıknatıs demir gibi metalleri çeker.", u:"f3", d:"easy"},
+      {q:"Bir cismi iten veya çeken etkiye ne denir?", o:["Enerji","Kuvvet","Hareket","Hız"], a:1, e:"Kuvvet, cismi iten veya çeken etkidir.", u:"f3", d:"easy"},
+      {q:"Buzun eriyerek suya dönüşmesine ne denir?", o:["Donma","Buharlaşma","Erime","Yoğunlaşma"], a:2, e:"Katıdan sıvıya geçiş=erime", u:"f4", d:"easy"},
+      {q:"Aşağıdakilerden hangisi saf maddedir?", o:["Limonata","Ayran","Tuz","Salata"], a:2, e:"Tuz tek tür maddedir, saf maddedir.", u:"f4", d:"medium"},
+      {q:"Karışımları ayırmak için hangi yöntem kullanılmaz?", o:["Süzme","Eleme","Boyama","Mıknatısla çekme"], a:2, e:"Boyama bir ayırma yöntemi değildir.", u:"f4", d:"medium"},
+      {q:"Hangisi yenilenebilir enerji kaynağıdır?", o:["Kömür","Doğalgaz","Güneş","Petrol"], a:2, e:"Güneş yenilenebilir enerji kaynağıdır.", u:"f6", d:"easy"},
+      {q:"Basit elektrik devresinde elektriği üreten elemana ne denir?", o:["Ampul","Anahtar","Pil","Kablo"], a:2, e:"Pil elektrik enerjisi üretir.", u:"f7", d:"easy"},
+      {q:"Ampulün görevi nedir?", o:["Elektrik üretmek","Devreyi açıp kapamak","Işık yaymak","Kablo bağlamak"], a:2, e:"Ampul elektriği ışığa çevirir.", u:"f7", d:"easy"},
+      {q:"Işık kirliliğinin sebebi nedir?", o:["Güneş","Ay","Gereksiz aydınlatma","Yıldızlar"], a:2, e:"Gereksiz ve aşırı aydınlatma ışık kirliliğine neden olur.", u:"f5", d:"medium"},
+      {q:"Geri dönüşüm sembolünün rengi nedir?", o:["Kırmızı","Mavi","Yeşil","Sarı"], a:2, e:"Geri dönüşüm sembolü genellikle yeşildir.", u:"f6", d:"easy"},
+      {q:"Su hangi sıcaklıkta donar?", o:["10°C","5°C","0°C","-10°C"], a:2, e:"Saf su 0°C'de donar.", u:"f4", d:"easy"},
+    ],
+    tf: [
+      {q:"Dünya Güneş'in etrafında döner.", a:true, e:"Doğru! Bir yılda döner.", u:"f1", d:"easy"},
+      {q:"Mıknatıs cam nesneleri çeker.", a:false, e:"Yanlış! Sadece demir, çelik gibi metalleri çeker.", u:"f3", d:"easy"},
+      {q:"Su 0°C'de donar.", a:true, e:"Doğru!", u:"f4", d:"easy"},
+      {q:"Ses boşlukta yayılabilir.", a:false, e:"Yanlış! Ses bir ortama ihtiyaç duyar.", u:"f5", d:"medium"},
+      {q:"Erime sırasında madde ısı alır.", a:true, e:"Doğru! Erime ısı alan bir hal değişimidir.", u:"f4", d:"medium"},
+      {q:"Limonata saf bir maddedir.", a:false, e:"Yanlış! Limonata bir karışımdır.", u:"f4", d:"easy"},
+      {q:"Pil elektrik enerjisi kaynağıdır.", a:true, e:"Doğru!", u:"f7", d:"easy"},
+      {q:"Geri dönüşüm doğayı korumaya yardımcı olur.", a:true, e:"Doğru!", u:"f6", d:"easy"},
+    ],
+    fb: [
+      {q:"Dünya kendi etrafında ___ saatte bir döner.", a:"24", e:"Kendi ekseni etrafında 24 saat.", u:"f1", d:"easy"},
+      {q:"Suyun katı haline ___ denir.", a:"buz", e:"Donmuş su=buz.", u:"f4", d:"easy"},
+      {q:"Elektrik devresinde ışık veren elemana ___ denir.", a:"ampul", e:"Ampul ışık verir.", u:"f7", d:"easy"},
+      {q:"Katı maddenin sıvıya dönüşmesine ___ denir.", a:"erime", e:"Katı→sıvı=erime.", u:"f4", d:"easy"},
+      {q:"İki veya daha fazla maddenin bir araya gelmesine ___ denir.", a:"karışım", e:"Karışım=birden fazla madde.", u:"f4", d:"easy"},
+    ]
+  },
+  sosyal: {
+    mc: [
+      {q:"İnsanları birbirinden farklı kılan özelliklere ne denir?", o:["Benzerlik","Bireysel farklılık","Ortaklık","Tekdüzelik"], a:1, e:"Her insanın kendine özgü farklılıkları vardır.", u:"s1", d:"easy"},
+      {q:"Hangisi somut kültürel miras örneğidir?", o:["Halk oyunları","Maniler","Tarihi camiler","Ninniler"], a:2, e:"Tarihi camiler somut kültürel mirastır.", u:"s2", d:"easy"},
+      {q:"Türkiye'de yasaları kim yapar?", o:["Cumhurbaşkanı","TBMM","Belediye","Vali"], a:1, e:"Yasama yetkisi TBMM'ye aittir.", u:"s3", d:"medium"},
+      {q:"Hangisi doğal afettir?", o:["Yangın","Deprem","Trafik kazası","Hava kirliliği"], a:1, e:"Deprem doğal afettir.", u:"s7", d:"easy"},
+      {q:"Ham maddeden ürün elde etmeye ne denir?", o:["Tüketim","Üretim","Dağıtım","İthalat"], a:1, e:"Üretim=ham maddeden ürün elde etme.", u:"s5", d:"easy"},
+      {q:"Tekerleğin icadı hangi alanda büyük gelişme sağlamıştır?", o:["Tarım","Ulaşım","Eğitim","Sağlık"], a:1, e:"Tekerlek ulaşımda devrim yapmıştır.", u:"s4", d:"easy"},
+      {q:"Aşağıdakilerden hangisi soyut kültürel mirastır?", o:["Kale","Türkü","Köprü","Heykel"], a:1, e:"Türküler soyut kültürel mirası oluşturur.", u:"s2", d:"medium"},
+      {q:"Demokratik bir ülkede yöneticileri kim seçer?", o:["Kral","Halk","Askerler","Zenginler"], a:1, e:"Demokraside yöneticileri halk seçer.", u:"s3", d:"easy"},
+      {q:"İhtiyaçlardan fazlasını almamaya ne denir?", o:["Savurganlık","Tutumluluk","Tüketim","Üretim"], a:1, e:"Tutumluluk=ihtiyaç kadar harcama.", u:"s5", d:"easy"},
+      {q:"Hangisi teknolojik bir gelişmedir?", o:["Yağmurun yağması","İnternetin icadı","Kuşların göçü","Deniz dalgası"], a:1, e:"İnternet teknolojik bir gelişmedir.", u:"s4", d:"easy"},
+      {q:"Doğal afetlere karşı ne yapmalıyız?", o:["Panik yapmalıyız","Hazırlıklı olmalıyız","Hiçbir şey yapamayız","Kaçmalıyız"], a:1, e:"Afetlere karşı önceden hazırlıklı olmalıyız.", u:"s7", d:"easy"},
+    ],
+    tf: [
+      {q:"Türkiye bir cumhuriyetle yönetilir.", a:true, e:"Doğru!", u:"s3", d:"easy"},
+      {q:"Somut kültürel miras elle tutulamaz.", a:false, e:"Yanlış! Somut miras elle tutulabilir.", u:"s2", d:"easy"},
+      {q:"Her insanın parmak izi aynıdır.", a:false, e:"Yanlış! Herkesin parmak izi farklıdır.", u:"s1", d:"easy"},
+      {q:"TBMM Ankara'da bulunur.", a:true, e:"Doğru! TBMM Ankara'dadır.", u:"s3", d:"easy"},
+      {q:"Geri dönüşüm çevreyi korumaya yardımcı olur.", a:true, e:"Doğru!", u:"s7", d:"easy"},
+      {q:"Teknoloji insan hayatını kolaylaştırır.", a:true, e:"Doğru!", u:"s4", d:"easy"},
+    ],
+    fb: [
+      {q:"Türkiye'de yasaları ___ yapar.", a:"TBMM", e:"Yasama yetkisi TBMM'nin.", u:"s3", d:"easy"},
+      {q:"Elle tutulabilen tarihi eserlere ___ kültürel miras denir.", a:"somut", e:"Camiler, kaleler=somut miras.", u:"s2", d:"easy"},
+      {q:"Ham maddeden ürün elde etmeye ___ denir.", a:"üretim", e:"Üretim=ham madde→ürün.", u:"s5", d:"easy"},
+      {q:"Türkiye Cumhuriyeti'nin başkenti ___'dır.", a:"Ankara", e:"Ankara başkenttir.", u:"s3", d:"easy"},
+    ]
+  }
+};
+
+// ============================================
+// APP STATE
+// ============================================
+let state = {
+  screen: "home",
+  course: null,
+  scope: null,
+  selectedUnits: [],
+  qCount: 15,
+  diffMix: { easy:40, medium:40, hard:20 },
+  diffPreset: "balanced",
+  questions: [],
+  currentQ: 0,
+  answers: {},
+  showExp: false,
+  timer: 0,
+  timerInterval: null,
+  scores: JSON.parse(localStorage.getItem("quiz_scores") || "[]")
+};
+
+function saveScores() {
+  localStorage.setItem("quiz_scores", JSON.stringify(state.scores.slice(-50)));
+}
+
+// ============================================
+// QUESTION GENERATOR
+// ============================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; }
+  return a;
+}
+
+function generateQuestions(courseKey, unitIds, count, mix) {
+  const bank = QUESTION_BANK[courseKey];
+  if (!bank) return [];
+  
+  const allQ = [];
+  
+  // Gather from bank
+  bank.mc.forEach(q => { if (unitIds.length===0 || unitIds.includes(q.u)) allQ.push({...q, type:"mc"}); });
+  bank.tf.forEach(q => { if (unitIds.length===0 || unitIds.includes(q.u)) allQ.push({...q, type:"tf"}); });
+  bank.fb.forEach(q => { if (unitIds.length===0 || unitIds.includes(q.u)) allQ.push({...q, type:"fb"}); });
+  
+  // Assign difficulty based on mix
+  const shuffled = shuffle(allQ);
+  const easyCount = Math.round(count * mix.easy / 100);
+  const medCount = Math.round(count * mix.medium / 100);
+  const hardCount = count - easyCount - medCount;
+  
+  const byDiff = { easy: shuffled.filter(q=>q.d==="easy"), medium: shuffled.filter(q=>q.d==="medium"), hard: shuffled.filter(q=>q.d==="hard") };
+  
+  const selected = [];
+  const pick = (pool, n) => { const p = shuffle(pool); for (let i=0; i<Math.min(n,p.length); i++) selected.push(p[i]); return Math.max(0, n-p.length); };
+  
+  let leftover = pick(byDiff.easy, easyCount);
+  leftover += pick(byDiff.medium, medCount);
+  leftover += pick(byDiff.hard, hardCount);
+  
+  // Fill remaining from any difficulty
+  if (leftover > 0) {
+    const remaining = shuffled.filter(q => !selected.includes(q));
+    pick(remaining, leftover);
+  }
+  
+  // Ensure we have exactly count questions (or close)
+  while (selected.length < count && shuffled.length > 0) {
+    const extra = shuffled[selected.length % shuffled.length];
+    if (!selected.find(s => s.q === extra.q)) selected.push({...extra});
+    else break;
+  }
+  
+  return shuffle(selected.slice(0, count)).map((q, i) => ({...q, id: i+1}));
+}
+
+// ============================================
+// RENDER ENGINE
+// ============================================
+const $ = id => document.getElementById(id);
+const app = () => document.getElementById("app");
+
+function render() {
+  switch(state.screen) {
+    case "home": renderHome(); break;
+    case "setup": renderSetup(); break;
+    case "quiz": renderQuiz(); break;
+    case "results": renderResults(); break;
+    case "advisor": renderAdvisor(); break;
+    case "history": renderHistory(); break;
+  }
+}
+
+function renderHome() {
+  const courseCards = Object.entries(COURSES).map(([k,c]) => {
+    const unitCount = [...c.units["1donem"], ...c.units["2donem"]].length;
+    return `<button onclick="selectCourse('${k}')" style="background:linear-gradient(135deg,${c.color}22,${c.color}11);border:2px solid ${c.color}44;border-radius:16px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;color:#F1F5F9;transition:all .2s" onmouseover="this.style.borderColor='${c.color}';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='${c.color}44';this.style.transform='none'">
+      <span style="font-size:32px">${c.icon}</span>
+      <span style="font-weight:700;font-size:15px">${c.name}</span>
+      <span style="font-size:11px;color:#94A3B8">${unitCount} ünite</span>
+    </button>`;
+  }).join("");
+
+  app().innerHTML = `
+    <div class="fade-in" style="flex:1;display:flex;flex-direction:column;padding-top:20px">
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:48px;margin-bottom:8px">📚</div>
+        <h1 style="font-family:'Baloo 2';font-size:28px;margin:0;background:linear-gradient(90deg,#38BDF8,#818CF8,#C084FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent">4. Sınıf Soru Bankası</h1>
+        <p style="color:#94A3B8;font-size:13px;margin:8px 0 0">MEB Müfredatına Uygun • İnteraktif Testler</p>
+      </div>
+      <div style="margin-bottom:24px">
+        <h3 style="font-size:14px;color:#94A3B8;margin-bottom:12px;font-weight:600">📋 Ders Seç</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${courseCards}</div>
+      </div>
+      <div style="margin-top:auto;padding-bottom:12px;display:flex;flex-direction:column;gap:8px">
+        <button onclick="goAdvisor()" class="btn-primary">🎓 Danışman Öğretmen Modu</button>
+        <button onclick="goHistory()" style="background:#1E293B;border:1px solid #334155;border-radius:14px;padding:14px;color:#94A3B8;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px">📊 Geçmiş Sonuçlarım</button>
+      </div>
+    </div>`;
+}
+
+function renderSetup() {
+  const c = COURSES[state.course];
+  const allUnits = [...c.units["1donem"], ...c.units["2donem"]];
+  
+  const scopeBtn = (key, label, desc) => {
+    const sel = state.scope === key;
+    return `<button onclick="setScope('${key}')" style="width:100%;background:${sel?c.color+'22':'#1E293B'};border:2px solid ${sel?c.color:'#334155'};border-radius:12px;padding:12px 16px;color:#F1F5F9;margin-bottom:8px;text-align:left;transition:all .2s">
+      <div style="font-weight:700;font-size:14px">${label}</div>
+      <div style="font-size:11px;color:#64748B">${desc}</div>
+    </button>`;
+  };
+
+  const unitBtn = (u) => {
+    const sel = state.selectedUnits.includes(u.id);
+    return `<button onclick="toggleUnit('${u.id}')" style="width:100%;background:${sel?c.color+'15':'#1E293B'};border:1px solid ${sel?c.color:'#334155'};border-radius:10px;padding:10px 14px;color:#F1F5F9;margin-top:4px;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:all .15s">
+      <div><div style="font-weight:600;font-size:13px">${u.unit}</div><div style="font-size:10px;color:#64748B">${u.topics.join(" • ")}</div></div>
+      <div style="width:20px;height:20px;border-radius:6px;border:2px solid ${sel?c.color:'#475569'};background:${sel?c.color:'transparent'};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0">${sel?"✓":""}</div>
+    </button>`;
+  };
+
+  const qCountBtn = (n, time) => {
+    const sel = state.qCount === n;
+    return `<button onclick="setQCount(${n})" style="flex:1;background:${sel?c.color+'22':'#1E293B'};border:2px solid ${sel?c.color:'#334155'};border-radius:12px;padding:14px 8px;color:#F1F5F9;text-align:center">
+      <div style="font-weight:800;font-size:20px">${n}</div>
+      <div style="font-size:10px;color:#64748B">${time}</div>
+    </button>`;
+  };
+
+  const diffBtn = (key, label, desc, mix) => {
+    const sel = state.diffPreset === key;
+    return `<button onclick="setDiff('${key}',${mix.easy},${mix.medium},${mix.hard})" style="width:100%;background:${sel?c.color+'15':'#1E293B'};border:1px solid ${sel?c.color:'#334155'};border-radius:10px;padding:10px 14px;color:#F1F5F9;margin-bottom:6px;text-align:left">
+      <div style="font-weight:700;font-size:13px">${label}</div>
+      <div style="font-size:10px;color:#64748B">${desc}</div>
+      <div style="display:flex;gap:2px;margin-top:6px;height:4px;border-radius:2px;overflow:hidden">
+        <div style="width:${mix.easy}%;background:#22C55E;border-radius:2px"></div>
+        <div style="width:${mix.medium}%;background:#F59E0B;border-radius:2px"></div>
+        <div style="width:${mix.hard}%;background:#EF4444;border-radius:2px"></div>
+      </div>
+    </button>`;
+  };
+
+  const canStart = state.selectedUnits.length > 0;
+
+  app().innerHTML = `
+    <div class="fade-in" style="padding-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-top:12px">
+        <button onclick="goHome()" style="background:#1E293B;border:1px solid #334155;border-radius:10px;padding:8px 12px;color:#94A3B8;font-size:14px">← Geri</button>
+        <div><h2 style="margin:0;font-size:20px;font-family:'Baloo 2'">${c.icon} ${c.name}</h2><p style="margin:0;color:#64748B;font-size:12px">Test Ayarları</p></div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:13px;color:#94A3B8;font-weight:600;display:block;margin-bottom:8px">📎 Kapsam</label>
+        ${scopeBtn("2donem","2. Dönem Konuları","Şu anki dönem")}
+        ${scopeBtn("tumyil","Tüm Yıl Tekrarı","1. ve 2. dönem")}
+        ${scopeBtn("hazirlik","5. Sınıfa Hazırlık","Tüm konular + ileri seviye")}
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:13px;color:#94A3B8;font-weight:600;display:block;margin-bottom:8px">📂 Ünite Seçimi</label>
+        <div><span style="font-size:11px;color:#64748B;font-weight:600">1. Dönem</span>${c.units["1donem"].map(unitBtn).join("")}</div>
+        <div style="margin-top:12px"><span style="font-size:11px;color:#64748B;font-weight:600">2. Dönem</span>${c.units["2donem"].map(unitBtn).join("")}</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button onclick="selectAllUnits()" style="flex:1;background:#334155;border:none;border-radius:8px;padding:8px;color:#94A3B8;font-size:11px;font-weight:600">Tümünü Seç</button>
+          <button onclick="clearUnits()" style="flex:1;background:#334155;border:none;border-radius:8px;padding:8px;color:#94A3B8;font-size:11px;font-weight:600">Temizle</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:13px;color:#94A3B8;font-weight:600;display:block;margin-bottom:8px">🔢 Soru Sayısı</label>
+        <div style="display:flex;gap:8px">
+          ${qCountBtn(10,"20-25 dk")}${qCountBtn(15,"25-30 dk")}${qCountBtn(20,"30-35 dk")}
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:13px;color:#94A3B8;font-weight:600;display:block;margin-bottom:8px">📊 Zorluk Dağılımı</label>
+        ${diffBtn("easy","Rahat Çalışma","60% kolay • 30% orta • 10% zor",{easy:60,medium:30,hard:10})}
+        ${diffBtn("balanced","Dengeli","40% kolay • 40% orta • 20% zor",{easy:40,medium:40,hard:20})}
+        ${diffBtn("challenge","Meydan Okuma","20% kolay • 40% orta • 40% zor",{easy:20,medium:40,hard:40})}
+      </div>
+
+      <button onclick="startQuiz()" ${canStart?"":"disabled"} style="width:100%;padding:16px;background:${canStart?`linear-gradient(135deg,${c.color},${c.color}CC)`:'#334155'};border:none;border-radius:14px;color:#fff;font-weight:800;font-size:16px;cursor:${canStart?'pointer':'not-allowed'};margin-top:8px">
+        ${canStart?`🚀 Teste Başla (${state.qCount} soru)`:"Ünite seçin"}
+      </button>
+    </div>`;
+}
+
+function renderQuiz() {
+  const q = state.questions[state.currentQ];
+  const c = COURSES[state.course];
+  const progress = ((state.currentQ+1)/state.questions.length)*100;
+  const diffColors = {easy:"#22C55E",medium:"#F59E0B",hard:"#EF4444"};
+  const diffLabels = {easy:"⭐ Kolay",medium:"⭐⭐ Orta",hard:"⭐⭐⭐ Zor"};
+  const typeLabels = {mc:"Çoktan Seçmeli",tf:"Doğru / Yanlış",fb:"Boşluk Doldurma"};
+  
+  const formatTime = s => `${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`;
+  
+  let answerHTML = "";
+  
+  if (q.type === "mc") {
+    answerHTML = q.o.map((opt, i) => {
+      const sel = state.answers[q.id] === i;
+      const correct = state.showExp && i === q.a;
+      const wrong = state.showExp && sel && i !== q.a;
+      const bg = correct?"#22C55E15":wrong?"#EF444415":sel?c.color+"15":"#0F172A";
+      const border = correct?"#22C55E":wrong?"#EF4444":sel?c.color:"#334155";
+      const dotBg = correct?"#22C55E":wrong?"#EF4444":sel?c.color:"#334155";
+      return `<button onclick="${state.showExp?'':'answerMC('+q.id+','+i+')'}" style="width:100%;background:${bg};border:2px solid ${border};border-radius:12px;padding:14px 16px;color:#F1F5F9;text-align:left;font-size:14px;font-weight:${sel?700:400};display:flex;align-items:center;gap:12px;margin-bottom:8px;transition:all .15s">
+        <span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:${dotBg};color:#fff;font-weight:800;font-size:13px;flex-shrink:0">${String.fromCharCode(65+i)}</span>${opt}
+      </button>`;
+    }).join("");
+  } else if (q.type === "tf") {
+    answerHTML = [true,false].map(val => {
+      const sel = state.answers[q.id] === val;
+      const correct = state.showExp && val === q.a;
+      const wrong = state.showExp && sel && val !== q.a;
+      const bg = correct?"#22C55E15":wrong?"#EF444415":sel?c.color+"15":"#0F172A";
+      const border = correct?"#22C55E":wrong?"#EF4444":sel?c.color:"#334155";
+      return `<button onclick="${state.showExp?'':'answerTF('+q.id+','+val+')'}" style="flex:1;padding:18px;border-radius:14px;background:${bg};border:2px solid ${border};color:#F1F5F9;font-weight:700;font-size:16px;text-align:center">${val?"✓ Doğru":"✗ Yanlış"}</button>`;
+    }).join("");
+    answerHTML = `<div style="display:flex;gap:10px">${answerHTML}</div>`;
+  } else {
+    const val = state.answers[q.id] || "";
+    const isCorrect = state.showExp && val.toString().trim().toLowerCase() === q.a.toString().toLowerCase();
+    const isWrong = state.showExp && !isCorrect;
+    const borderC = state.showExp ? (isCorrect?"#22C55E":"#EF4444") : "#334155";
+    answerHTML = `<input type="text" id="fb-input" value="${val}" oninput="answerFB(${q.id},this.value)" placeholder="Cevabını yaz..." ${state.showExp?"readonly":""} style="width:100%;padding:14px 16px;border-radius:12px;border:2px solid ${borderC};background:#0F172A;color:#F1F5F9;font-size:16px;font-weight:600;outline:none;box-sizing:border-box">`;
+    if (isWrong) answerHTML += `<div style="margin-top:8px;color:#22C55E;font-size:13px;font-weight:600">Doğru cevap: ${q.a}</div>`;
+  }
+
+  const expHTML = state.showExp && q.e ? `<div style="margin-top:16px;background:#0F172A;border:1px solid #334155;border-radius:12px;padding:14px">
+    <div style="font-size:11px;color:#94A3B8;font-weight:600;margin-bottom:4px">💡 Açıklama</div>
+    <div style="font-size:13px;line-height:1.5;color:#CBD5E1">${q.e}</div>
+  </div>` : "";
+
+  const hasAnswer = state.answers[q.id] !== undefined;
+  let navBtns = "";
+  if (state.currentQ > 0) navBtns += `<button onclick="prevQ()" style="flex:1;background:#334155;border:none;border-radius:12px;padding:14px;color:#94A3B8;font-weight:700;font-size:14px">← Önceki</button>`;
+  if (hasAnswer && !state.showExp) navBtns += `<button onclick="checkAnswer()" style="flex:1;background:#7C3AED;border:none;border-radius:12px;padding:14px;color:#fff;font-weight:700;font-size:14px">Kontrol Et</button>`;
+  if (state.showExp && state.currentQ < state.questions.length-1) navBtns += `<button onclick="nextQ()" style="flex:1;background:${c.color};border:none;border-radius:12px;padding:14px;color:#fff;font-weight:700;font-size:14px">Sonraki →</button>`;
+  if (state.showExp && state.currentQ === state.questions.length-1) navBtns += `<button onclick="finishQuiz()" style="flex:1;background:linear-gradient(135deg,#22C55E,#16A34A);border:none;border-radius:12px;padding:14px;color:#fff;font-weight:700;font-size:14px">✓ Testi Bitir</button>`;
+
+  // Question dots
+  const dots = state.questions.map((_, i) => {
+    const bg = i===state.currentQ ? c.color : state.answers[state.questions[i].id]!==undefined ? c.color+"44" : "#334155";
+    const col = i===state.currentQ ? "#fff" : "#94A3B8";
+    return `<button onclick="goToQ(${i})" class="q-dot" style="background:${bg};color:${col};border:none">${i+1}</button>`;
+  }).join("");
+
+  // Find unit info
+  const allUnits = [...COURSES[state.course].units["1donem"], ...COURSES[state.course].units["2donem"]];
+  const unitInfo = allUnits.find(u => u.id === q.u);
+  const unitLabel = unitInfo ? unitInfo.unit : "";
+
+  app().innerHTML = `
+    <div class="fade-in" style="padding-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-top:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px">${c.icon}</span>
+          <span style="font-weight:700;font-size:14px">${state.currentQ+1}/${state.questions.length}</span>
+        </div>
+        <div style="background:#1E293B;border:1px solid #334155;border-radius:8px;padding:4px 12px;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">⏱ ${formatTime(state.timer)}</div>
+      </div>
+
+      <div class="progress-bar"><div class="progress-fill" style="width:${progress}%;background:linear-gradient(90deg,${c.color},${c.color}88)"></div></div>
+
+      <div class="card" style="border-radius:20px;padding:20px">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <span class="tag" style="background:${c.color}22;color:${c.color}">${unitLabel}</span>
+          <span class="tag" style="background:${diffColors[q.d]}22;color:${diffColors[q.d]}">${diffLabels[q.d]}</span>
+          <span class="tag" style="background:#334155;color:#94A3B8">${typeLabels[q.type]}</span>
+        </div>
+        <p style="font-size:16px;font-weight:700;line-height:1.5;margin:0 0 20px">${q.q}</p>
+        ${answerHTML}
+        ${expHTML}
+      </div>
+
+      <div style="display:flex;gap:8px">${navBtns}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:16px;justify-content:center">${dots}</div>
+    </div>`;
+}
+
+function renderResults() {
+  const c = COURSES[state.course];
+  let correct = 0;
+  const byDiff = {easy:{c:0,t:0},medium:{c:0,t:0},hard:{c:0,t:0}};
+  const wrongs = [];
+
+  state.questions.forEach(q => {
+    byDiff[q.d].t++;
+    let isC = false;
+    if (q.type==="tf") isC = state.answers[q.id]===q.a;
+    else if (q.type==="fb") isC = (state.answers[q.id]||"").toString().trim().toLowerCase()===q.a.toString().toLowerCase();
+    else isC = state.answers[q.id]===q.a;
+    if (isC) { correct++; byDiff[q.d].c++; }
+    else wrongs.push(q);
+  });
+
+  const total = state.questions.length;
+  const pct = Math.round((correct/total)*100);
+  const formatTime = s => `${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`;
+
+  // Save score
+  state.scores.push({
+    date: new Date().toLocaleDateString("tr-TR"),
+    course: c.name,
+    icon: c.icon,
+    score: correct,
+    total,
+    pct,
+    time: formatTime(state.timer)
+  });
+  saveScores();
+
+  let emoji, msg;
+  if (pct>=90){emoji="🏆";msg="Muhteşem! Harika bir performans!";}
+  else if(pct>=70){emoji="🌟";msg="Çok iyi! Biraz daha pratikle mükemmel olur!";}
+  else if(pct>=50){emoji="💪";msg="İyi gidiyorsun! Tekrar edersen daha iyi olur!";}
+  else{emoji="📚";msg="Konuları tekrar edelim, sen yaparsın!";}
+
+  const diffHTML = Object.entries(byDiff).filter(([,d])=>d.t>0).map(([k,d]) => {
+    const colors = {easy:"#22C55E",medium:"#F59E0B",hard:"#EF4444"};
+    const labels = {easy:"⭐ Kolay",medium:"⭐⭐ Orta",hard:"⭐⭐⭐ Zor"};
+    const w = d.t>0 ? (d.c/d.t)*100 : 0;
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:${colors[k]};font-weight:600">${labels[k]}</span><span style="color:#94A3B8">${d.c}/${d.t}</span></div>
+      <div style="height:6px;background:#0F172A;border-radius:3px;overflow:hidden"><div style="height:100%;width:${w}%;background:${colors[k]};border-radius:3px"></div></div>
+    </div>`;
+  }).join("");
+
+  const wrongsHTML = wrongs.length>0 ? `
+    <div class="card" style="border-radius:16px;padding:16px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 12px;color:#EF4444">❌ Yanlış Cevaplar (${wrongs.length})</h3>
+      ${wrongs.map(q => `<div style="background:#0F172A;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid #EF4444">
+        <div style="font-size:12px;font-weight:700;margin-bottom:4px">${q.q}</div>
+        ${q.e?`<div style="font-size:11px;color:#94A3B8">💡 ${q.e}</div>`:""}
+      </div>`).join("")}
+    </div>` : "";
+
+  const advice = pct>=80
+    ? `Harika! ${c.name} dersinde çok iyi gidiyorsun. "Meydan Okuma" modunu dene!`
+    : pct>=50
+    ? `İyi başlangıç! Yanlışlarını incele, o konuları tekrar çalış.`
+    : `Konuları baştan tekrar edelim. "Rahat Çalışma" modunda kolay sorularla başla.`;
+
+  app().innerHTML = `
+    <div class="fade-in" style="padding-top:20px;padding-bottom:20px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:56px">${emoji}</div>
+        <div style="font-size:48px;font-weight:900;font-family:'Baloo 2';background:linear-gradient(135deg,${c.color},#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">%${pct}</div>
+        <div style="font-size:16px;color:#94A3B8;font-weight:600">${correct} / ${total} doğru</div>
+        <div style="font-size:14px;color:#CBD5E1;margin-top:8px">${msg}</div>
+        <div style="font-size:13px;color:#64748B;margin-top:4px">⏱ Süre: ${formatTime(state.timer)}</div>
+      </div>
+      <div class="card" style="border-radius:16px;padding:16px">
+        <h3 style="font-size:14px;font-weight:700;margin:0 0 12px">📊 Zorluk Analizi</h3>
+        ${diffHTML}
+      </div>
+      ${wrongsHTML}
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button onclick="retryQuiz()" style="flex:1;background:${c.color};border:none;border-radius:12px;padding:14px;color:#fff;font-weight:700;font-size:14px">🔄 Tekrar Çöz</button>
+        <button onclick="goHome()" style="flex:1;background:#334155;border:none;border-radius:12px;padding:14px;color:#94A3B8;font-weight:700;font-size:14px">🏠 Ana Sayfa</button>
+      </div>
+      <div style="background:linear-gradient(135deg,#7C3AED22,#6D28D922);border:1px solid #7C3AED44;border-radius:16px;padding:16px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">🎓 Öğretmen Önerisi</div>
+        <div style="font-size:12px;color:#CBD5E1;line-height:1.6">${advice}</div>
+      </div>
+    </div>`;
+}
+
+function renderAdvisor() {
+  const days = [
+    {d:"Pazartesi",c:"Matematik",i:"🔢",t:"Sayılar ve işlemler",col:"#4F46E5"},
+    {d:"Salı",c:"Türkçe",i:"📖",t:"Dil bilgisi + okuma",col:"#DC2626"},
+    {d:"Çarşamba",c:"Fen Bilimleri",i:"🔬",t:"Deney ve gözlem",col:"#059669"},
+    {d:"Perşembe",c:"Sosyal Bilgiler",i:"🌍",t:"Tarih ve coğrafya",col:"#D97706"},
+    {d:"Cuma",c:"Karma Deneme",i:"🎯",t:"4 dersten karışık",col:"#7C3AED"},
+  ];
+
+  app().innerHTML = `
+    <div class="fade-in" style="padding-top:12px;padding-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <button onclick="goHome()" style="background:#1E293B;border:1px solid #334155;border-radius:10px;padding:8px 12px;color:#94A3B8;font-size:14px">← Geri</button>
+        <h2 style="margin:0;font-size:20px;font-family:'Baloo 2'">🎓 Danışman Öğretmen</h2>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#7C3AED22,#6D28D922);border:1px solid #7C3AED44;border-radius:20px;padding:24px;margin-bottom:20px">
+        <h3 style="font-size:18px;font-weight:800;margin:0 0 12px;font-family:'Baloo 2'">Merhaba! 👋</h3>
+        <p style="font-size:14px;line-height:1.7;color:#CBD5E1;margin:0">4. sınıftan 5. sınıfa geçiş çok önemli bir dönem. Birlikte çalışarak seni ortaokula en iyi şekilde hazırlayacağız!</p>
+      </div>
+
+      <div class="card" style="padding:20px">
+        <h3 style="font-size:15px;font-weight:700;margin:0 0 16px">📋 Haftalık Çalışma Planı</h3>
+        ${days.map(p => `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #334155">
+          <span style="font-size:24px">${p.i}</span>
+          <div style="flex:1"><div style="font-weight:700;font-size:13px">${p.d} — ${p.c}</div><div style="font-size:11px;color:#64748B">${p.t}</div></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:${p.col}"></div>
+        </div>`).join("")}
+      </div>
+
+      <div class="card" style="padding:20px">
+        <h3 style="font-size:15px;font-weight:700;margin:0 0 12px">💡 Önemli İpuçları</h3>
+        <div style="font-size:13px;color:#CBD5E1;line-height:1.8">
+          <div style="margin-bottom:8px">🕐 <strong>Günde 30 dakika</strong> düzenli çalışma en etkili yöntem.</div>
+          <div style="margin-bottom:8px">📝 <strong>Yanlış defteri</strong> tut — her yanlışı not al, hafta sonunda tekrar çöz.</div>
+          <div style="margin-bottom:8px">🎮 <strong>Ödül sistemi</strong> — her başarılı testten sonra kendine ödül ver.</div>
+          <div>🔄 <strong>Tekrar</strong> — aynı testi 2-3 gün sonra tekrar çöz.</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:20px">
+        <h3 style="font-size:15px;font-weight:700;margin:0 0 12px">🎯 5. Sınıfa Hazırlık Yol Haritası</h3>
+        <div style="font-size:13px;color:#CBD5E1;line-height:1.8">
+          <div style="margin-bottom:10px;padding:10px;background:#0F172A;border-radius:10px;border-left:3px solid #22C55E"><strong>Mart-Nisan:</strong> 2. dönem konularını pekiştir.</div>
+          <div style="margin-bottom:10px;padding:10px;background:#0F172A;border-radius:10px;border-left:3px solid #F59E0B"><strong>Mayıs:</strong> Tüm yıl tekrarı + karma deneme.</div>
+          <div style="padding:10px;background:#0F172A;border-radius:10px;border-left:3px solid #4F46E5"><strong>Haziran:</strong> 5. sınıf konularına giriş.</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderHistory() {
+  const scores = [...state.scores].reverse();
+  
+  app().innerHTML = `
+    <div class="fade-in" style="padding-top:12px;padding-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <button onclick="goHome()" style="background:#1E293B;border:1px solid #334155;border-radius:10px;padding:8px 12px;color:#94A3B8;font-size:14px">← Geri</button>
+        <h2 style="margin:0;font-size:20px;font-family:'Baloo 2'">📊 Geçmiş Sonuçlar</h2>
+      </div>
+      ${scores.length===0 ? `<div style="text-align:center;padding:40px;color:#64748B"><div style="font-size:48px;margin-bottom:12px">📝</div><p>Henüz test çözmedin. İlk testini çöz!</p></div>` : 
+        scores.map(s => `<div class="card" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">${s.icon}</span>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:14px">${s.course}</div>
+            <div style="font-size:11px;color:#64748B">${s.date} • ⏱ ${s.time}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:800;font-size:18px;color:${s.pct>=70?'#22C55E':s.pct>=50?'#F59E0B':'#EF4444'}">%${s.pct}</div>
+            <div style="font-size:11px;color:#94A3B8">${s.score}/${s.total}</div>
+          </div>
+        </div>`).join("")
+      }
+    </div>`;
+}
+
+// ============================================
+// ACTIONS
+// ============================================
+window.selectCourse = (k) => { state.course=k; state.scope=null; state.selectedUnits=[]; state.screen="setup"; render(); };
+window.goHome = () => { clearInterval(state.timerInterval); state.screen="home"; state.course=null; render(); };
+window.goAdvisor = () => { state.screen="advisor"; render(); };
+window.goHistory = () => { state.screen="history"; render(); };
+
+window.setScope = (k) => {
+  state.scope = k;
+  const c = COURSES[state.course];
+  if (k==="2donem") state.selectedUnits = c.units["2donem"].map(u=>u.id);
+  else if (k==="tumyil" || k==="hazirlik") state.selectedUnits = [...c.units["1donem"],...c.units["2donem"]].map(u=>u.id);
+  render();
+};
+
+window.toggleUnit = (id) => {
+  if (state.selectedUnits.includes(id)) state.selectedUnits = state.selectedUnits.filter(x=>x!==id);
+  else state.selectedUnits.push(id);
+  render();
+};
+
+window.selectAllUnits = () => {
+  const c = COURSES[state.course];
+  state.selectedUnits = [...c.units["1donem"],...c.units["2donem"]].map(u=>u.id);
+  render();
+};
+
+window.clearUnits = () => { state.selectedUnits=[]; render(); };
+window.setQCount = (n) => { state.qCount=n; render(); };
+window.setDiff = (key,e,m,h) => { state.diffPreset=key; state.diffMix={easy:e,medium:m,hard:h}; render(); };
+
+window.startQuiz = () => {
+  state.questions = generateQuestions(state.course, state.selectedUnits, state.qCount, state.diffMix);
+  if (state.questions.length === 0) { alert("Seçilen ünitelerde yeterli soru bulunamadı."); return; }
+  state.currentQ = 0;
+  state.answers = {};
+  state.showExp = false;
+  state.timer = 0;
+  clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(() => { state.timer++; const el=document.querySelector("[data-timer]"); if(el) el.textContent="⏱ "+`${Math.floor(state.timer/60).toString().padStart(2,"0")}:${(state.timer%60).toString().padStart(2,"0")}`; }, 1000);
+  state.screen = "quiz";
+  render();
+};
+
+window.retryQuiz = () => { startQuiz(); };
+
+window.answerMC = (qId, i) => { state.answers[qId]=i; render(); };
+window.answerTF = (qId, val) => { state.answers[qId]=val; render(); };
+window.answerFB = (qId, val) => { state.answers[qId]=val; };
+window.checkAnswer = () => { state.showExp=true; render(); };
+window.prevQ = () => { state.currentQ--; state.showExp=false; render(); };
+window.nextQ = () => { state.currentQ++; state.showExp=false; render(); };
+window.goToQ = (i) => { state.currentQ=i; state.showExp=false; render(); };
+
+window.finishQuiz = () => {
+  clearInterval(state.timerInterval);
+  state.screen = "results";
+  render();
+};
+
+// Init
+render();
+</script>
+</body>
+</html>
